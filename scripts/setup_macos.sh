@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 if [[ "$(uname -s)" != "Darwin" ]]; then
-  echo "This setup script is intended for macOS. You can still install manually with pip install -e ."
+  echo "This setup script is intended for macOS."
 fi
 
 PYTHON_BIN="${PYTHON_BIN:-python3}"
@@ -21,13 +21,16 @@ if sys.version_info < (3, 10):
 print(f"Using Python {sys.version.split()[0]}")
 PY
 
-if [[ ! -d .venv ]]; then
-  "$PYTHON_BIN" -m venv .venv
+if ! command -v uv >/dev/null 2>&1; then
+  echo "uv is required but not found. Install it from https://docs.astral.sh/uv/getting-started/installation/."
+  exit 1
 fi
 
-source .venv/bin/activate
-python -m pip install -U pip setuptools wheel
-python -m pip install -e .
+if [[ ! -d .venv ]]; then
+  uv venv .venv
+fi
+
+uv sync
 
 cat <<'TXT'
 

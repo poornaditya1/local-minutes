@@ -33,9 +33,15 @@ class StartRecordingRequest(BaseModel):
     system_device: Optional[str] = None
     meeting_title: str = "Untitled meeting"
     manual_notes: str = ""
-    lmstudio_base_url: str = DEFAULT_BASE_URL
-    lmstudio_model: str = Field(default="", description="Model ID currently loaded in LM Studio.")
-    whisper_model: str = Field(default="small", description="faster-whisper model size or path, such as tiny, base, small, medium, large-v3")
+    lmstudio_base_url: str = os.getenv("LOCAL_MINUTES_LMSTUDIO_BASE_URL", DEFAULT_BASE_URL)
+    lmstudio_model: str = Field(
+        default=os.getenv("LOCAL_MINUTES_LMSTUDIO_MODEL", ""),
+        description="Model ID currently loaded in LM Studio.",
+    )
+    whisper_model: str = Field(
+        default=os.getenv("LOCAL_MINUTES_WHISPER_MODEL", "small"),
+        description="faster-whisper model size or path, such as tiny, base, small, medium, large-v3",
+    )
     mic_gain: float = Field(default=1.0, ge=0.1, le=4.0)
     system_gain: float = Field(default=1.0, ge=0.1, le=4.0)
 
@@ -100,6 +106,7 @@ def api_recorder_status() -> Dict[str, object]:
 
 @app.get("/api/lmstudio-models")
 def api_lmstudio_models(base_url: str = DEFAULT_BASE_URL) -> Dict[str, object]:
+    base_url = (base_url or "").strip() or os.getenv("LOCAL_MINUTES_LMSTUDIO_BASE_URL", DEFAULT_BASE_URL)
     try:
         return {"models": list_models(base_url)}
     except LMStudioError as exc:
@@ -112,7 +119,8 @@ def api_start(req: StartRecordingRequest) -> Dict[str, object]:
     with _jobs_lock:
         if _active_job_id:
             raise HTTPException(status_code=409, detail="A recording job is already active.")
-        if not req.lmstudio_model:
+        req_model = req.lmstudio_model.strip() or os.getenv("LOCAL_MINUTES_LMSTUDIO_MODEL", "").strip()
+        if not req_model:
             raise HTTPException(status_code=400, detail="Select or type an LM Studio model ID before starting.")
 
     try:
@@ -125,9 +133,9 @@ def api_start(req: StartRecordingRequest) -> Dict[str, object]:
         session_id=session_id,
         meeting_title=req.meeting_title.strip() or "Untitled meeting",
         manual_notes=req.manual_notes,
-        lmstudio_base_url=req.lmstudio_base_url.strip() or DEFAULT_BASE_URL,
-        lmstudio_model=req.lmstudio_model.strip(),
-        whisper_model=req.whisper_model.strip() or "small",
+        lmstudio_base_url=req.lmstudio_base_url.strip() or os.getenv("LOCAL_MINUTES_LMSTUDIO_BASE_URL", DEFAULT_BASE_URL),
+        lmstudio_model=req_model,
+        whisper_model=req.whisper_model.strip() or os.getenv("LOCAL_MINUTES_WHISPER_MODEL", "small"),
     )
     with _jobs_lock:
         _jobs[job.job_id] = job

@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "local-minutes"
 version = "0.2.0"
@@ -11,7 +15,8 @@ dependencies = [
   "numpy>=1.26.0",
   "soundcard>=0.4.3",
   "soundfile>=0.12.1",
-  "faster-whisper>=1.0.3"
+  "faster-whisper>=1.0.3",
+  "python-dotenv>=1.0.1"
 ]
 
 [project.scripts]

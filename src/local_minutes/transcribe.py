@@ -78,7 +78,10 @@ def _dedupe_near_duplicate_segments(segments: List[TranscriptSegment]) -> List[T
     if len(segments) < 2:
         return segments
 
-    window_seconds = _env_float("LOCAL_MINUTES_DEDUP_WINDOW_SECONDS", 2.5, minimum=0.1, maximum=15.0)
+    window_var = "LOCAL_MINUTES_DEDUP_WINDOW_SECONDS"
+    if os.getenv(window_var) is None and os.getenv("LOCAL_MINUTES_DEDUP_TIME_WINDOW_SECONDS") is not None:
+        window_var = "LOCAL_MINUTES_DEDUP_TIME_WINDOW_SECONDS"
+    window_seconds = _env_float(window_var, 2.5, minimum=0.1, maximum=15.0)
     threshold = _env_float("LOCAL_MINUTES_DEDUP_SIMILARITY", 0.84, minimum=0.5, maximum=1.0)
     preferred = os.getenv("LOCAL_MINUTES_DEDUP_PREFER", "system").strip().lower()
     keep = [True] * len(segments)

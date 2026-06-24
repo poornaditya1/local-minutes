@@ -2,14 +2,17 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-if [[ ! -d .venv ]]; then
-  echo "Creating Python virtual environment..."
-  python3 -m venv .venv
+if ! command -v uv >/dev/null 2>&1; then
+  echo "uv is required but not found. Install it from https://docs.astral.sh/uv/getting-started/installation/."
+  exit 1
 fi
 
-source .venv/bin/activate
-python -m pip install -q -U pip setuptools wheel
-python -m pip install -q -e .
+if [[ ! -d .venv ]]; then
+  echo "Creating Python virtual environment with uv..."
+  uv venv .venv
+fi
+
+uv sync --quiet
 
 (sleep 2; open http://127.0.0.1:${LOCAL_MINUTES_PORT:-8765}) >/dev/null 2>&1 &
-python run.py
+uv run python run.py

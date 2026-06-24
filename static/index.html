@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Local Minutes for Mac</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="eyebrow">Mac-optimized local meeting notes</p>
+      <h1>Local Minutes</h1>
+      <p class="subhead">Record your microphone and meeting audio, transcribe locally with faster-whisper, and create structured notes with LM Studio.</p>
+    </header>
+
+    <section class="card consent-card">
+      <strong>Consent reminder:</strong> Ask participants before recording or transcribing a meeting. Laws and company policies vary.
+    </section>
+
+    <section id="macHelp" class="card mac-card" hidden>
+      <h2>macOS system audio setup</h2>
+      <div class="steps">
+        <div><strong>1.</strong> Install a virtual audio device such as BlackHole 2ch, Loopback, or VB-Cable.</div>
+        <div><strong>2.</strong> Open Audio MIDI Setup and create a Multi-Output Device that includes your headphones or speakers plus the virtual device.</div>
+        <div><strong>3.</strong> Set that Multi-Output Device as your Mac output, then choose the virtual device as System audio in this app.</div>
+        <div><strong>4.</strong> Grant microphone permission to Terminal, Python, or your IDE when macOS prompts.</div>
+      </div>
+      <div id="deviceWarnings" class="warnings"></div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>1. Meeting setup</h2>
+        <label>Meeting title
+          <input id="meetingTitle" type="text" value="Untitled meeting" />
+        </label>
+        <label>Rough notes or agenda
+          <textarea id="manualNotes" rows="7" placeholder="Type agenda, attendee names, decisions you want emphasized, or live notes here."></textarea>
+        </label>
+      </div>
+
+      <div class="card">
+        <h2>2. Local AI setup</h2>
+        <label>LM Studio base URL
+          <input id="baseUrl" type="text" value="http://localhost:1234/v1" />
+        </label>
+        <div class="row">
+          <label class="grow">LM Studio model
+            <input id="lmModel" list="lmModelList" placeholder="Select or type a loaded model ID" />
+            <datalist id="lmModelList"></datalist>
+          </label>
+          <button id="refreshModels" type="button">Refresh</button>
+        </div>
+        <label>Whisper model
+          <select id="whisperModel">
+            <option value="tiny">tiny, fastest</option>
+            <option value="base">base, balanced</option>
+            <option value="small" selected>small, recommended for Apple Silicon</option>
+            <option value="medium">medium, better but slower</option>
+            <option value="large-v3">large-v3, best but heavy</option>
+          </select>
+        </label>
+        <p class="hint">In LM Studio, load a chat model and start the Local Server. The default server URL is usually port 1234.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>3. Audio sources</h2>
+      <div class="grid two">
+        <label>Microphone, your voice
+          <select id="micDevice"></select>
+        </label>
+        <label>System audio, meeting participants
+          <select id="systemDevice"></select>
+        </label>
+      </div>
+      <div class="grid two compact-grid">
+        <label>Mic gain
+          <select id="micGain">
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>
+        </label>
+        <label>System gain
+          <select id="systemGain">
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>
+        </label>
+      </div>
+      <div class="row">
+        <button id="refreshDevices" type="button">Refresh devices</button>
+        <span class="hint">For macOS, the System audio dropdown should usually be BlackHole, Loopback, VB-Cable, or an aggregate input.</span>
+      </div>
+    </section>
+
+    <section class="card controls">
+      <button id="startBtn" class="primary" type="button">Start recording</button>
+      <button id="stopBtn" class="danger" type="button" disabled>Stop and generate notes</button>
+      <span id="status" class="status">Ready.</span>
+    </section>
+
+    <section class="card diagnostics-card">
+      <h2>Live recording diagnostics</h2>
+      <pre id="recordingDiagnostics">Start a recording to see mic and system audio levels.</pre>
+    </section>
+
+    <section class="grid">
+      <div class="card result">
+        <h2>Meeting notes</h2>
+        <div id="links" class="links"></div>
+        <pre id="notesOutput">Notes will appear here.</pre>
+      </div>
+      <div class="card result">
+        <h2>Transcript</h2>
+        <pre id="transcriptOutput">Transcript will appear here.</pre>
+      </div>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

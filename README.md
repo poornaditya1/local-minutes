@@ -17,6 +17,7 @@ The app is intentionally bot-free. It does not join Zoom, Teams, Meet, or Webex.
 
 - macOS on Apple Silicon or Intel.
 - Python 3.10 or newer.
+- uv package manager.
 - LM Studio with a chat model loaded and the Local Server started.
 - A virtual audio device for system audio, unless you only want microphone transcription.
 
@@ -52,11 +53,9 @@ You can also run it manually:
 
 ```bash
 cd local-minutes
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -U pip setuptools wheel
-pip install -e .
-python run.py
+uv venv .venv
+uv sync
+uv run python run.py
 ```
 
 ## Start LM Studio
