@@ -1,0 +1,20 @@
+# Local run outputs
+data/
+
+# Packaging metadata
+*.egg-info/
+
+# Python bytecode/cache
+__pycache__/
+**/__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local environment files
+.env
+.env.*
+!.env.example
