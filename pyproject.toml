@@ -1,0 +1,21 @@
+[project]
+name = "local-minutes"
+version = "0.2.0"
+description = "Mac-optimized local-first meeting transcription and notes app using faster-whisper and LM Studio."
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.30.0",
+  "pydantic>=2.7.0",
+  "requests>=2.31.0",
+  "numpy>=1.26.0",
+  "soundcard>=0.4.3",
+  "soundfile>=0.12.1",
+  "faster-whisper>=1.0.3"
+]
+
+[project.scripts]
+local-minutes = "local_minutes.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
